@@ -68,5 +68,6 @@
     "forceConsistentCasingInFileNames": true  /* Disallow inconsistently-cased references to the same file. */
   },
 
+  "include": ["./src", "src/helpers/reporter.ts"],
   "exclude": ["node_modules", "build", "spec"]
 }
