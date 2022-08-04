@@ -1,9 +1,9 @@
 import Client from '../database';
 
 export type Product = {
-  product_id?: number,
-  product_name: string,
-  product_price: number}
+  id?: number,
+  name: string,
+  price: number}
 
 export class ProductStore {
   async index(): Promise<Product[]> {
@@ -21,7 +21,7 @@ export class ProductStore {
   async show(id: number): Promise<Product> {
     try {
       const conn = await Client.connect();
-      const sql = 'SELECT * FROM products WHERE product_id=($1)';
+      const sql = 'SELECT * FROM products WHERE id=($1)';
       const result = await conn.query(sql, [id]);
       conn.release();
       return result.rows[0];
@@ -34,13 +34,13 @@ export class ProductStore {
     
     try {
       const conn = await Client.connect();
-      const sql = 'INSERT INTO products (product_name, product_price) VALUES($1, $2) RETURNING *';
-      const result = await conn.query(sql, [prod.product_name, prod.product_price]);
+      const sql = 'INSERT INTO products (name, price) VALUES($1, $2) RETURNING *';
+      const result = await conn.query(sql, [prod.name, prod.price]);
       const product = result.rows[0];
       conn.release();
       return product;
     } catch (err) {
-      throw new Error(`Cant create new product ${prod.product_name}. Error: ${err}`);
+      throw new Error(`Cant create new product ${prod.name}. Error: ${err}`);
     }
   }
 }

@@ -16,7 +16,7 @@ const index = async (req: Request, res: Response) => {
 
 const show = async (req: Request, res: Response) => {
   try {
-    const product: Product = await store.show(req.body.product_id);
+    const product: Product = await store.show(req.body.id);
     res.json(product);
   } catch (err) {
     res.status(400);
@@ -27,8 +27,8 @@ const show = async (req: Request, res: Response) => {
 const create = async (req: Request, res: Response) => {
   try {
     const product: Product = {
-      product_name: req.body.product_name,
-      product_price: req.body.product_price};
+      name: req.body.name,
+      price: req.body.price};
 
     const newProduct: Product = await store.create(product);
     res.json(newProduct);
@@ -38,10 +38,10 @@ const create = async (req: Request, res: Response) => {
   }
 };
 
-const productsRoutes = (app: express.Application) => {
+const RoutesProducts = (app: express.Application) => {
   app.get('/products', index);
   app.get('/products/:id', show);
   app.post('/products/create', verifyAuthToken, create);
 };
 
-export default productsRoutes;
+export default RoutesProducts;

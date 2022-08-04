@@ -14,8 +14,8 @@ const show = async (req: Request, res: Response) => {
   }
 };
 
-const ordersRoutes = (app: express.Application) => {
+const RoutesOrders = (app: express.Application) => {
   app.get('/orders/:id', verifyAuthToken, show);
 };
 
-export default ordersRoutes;
+export default RoutesOrders;

@@ -3,7 +3,7 @@ import Client from '../database';
 
 const saltRounds = process.env.SALT_ROUNDS;
 export type User = {
-  user_id?: number,
+  id?: number,
   user_name: string,
   first_name: string,
   last_name: string,
