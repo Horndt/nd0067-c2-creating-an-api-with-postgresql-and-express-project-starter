@@ -5,32 +5,18 @@ dotenv.config();
 const {
   POSTGRES_HOST,
   POSTGRES_DB,
-  POSTGRES_DB_TEST,
   POSTGRES_USER,
   POSTGRES_PASSWORD,
+  POSTGRES_TEST_DB,
   ENV,
 } = process.env;
 
-let client: Pool;
-console.log(ENV);
-
-if (ENV === "dev") {
-  client = new Pool({
-    host: POSTGRES_HOST,
-    database: POSTGRES_DB,
-    user: POSTGRES_USER,
-    password: POSTGRES_PASSWORD,
-  });
-} else if (ENV === "test") {
-  client = new Pool({
-    host: POSTGRES_HOST,
-    database: POSTGRES_DB_TEST,
-    user: POSTGRES_USER,
-    password: POSTGRES_PASSWORD,
-  });
-} else {
-  client = new Pool(undefined);
-  console.error("There is something wrong whith your ENV");
-}
+// recruite the method pool as the actual connection to the database
+const client = new Pool({
+  host: POSTGRES_HOST,
+  database: ENV === "dev" ? POSTGRES_DB : POSTGRES_TEST_DB,
+  user: POSTGRES_USER,
+  password: `${POSTGRES_PASSWORD}`,
+});
 
 export default client;

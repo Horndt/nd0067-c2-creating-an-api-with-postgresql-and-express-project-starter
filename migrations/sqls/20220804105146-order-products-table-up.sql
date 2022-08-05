@@ -1,6 +1,6 @@
 CREATE TABLE order_products (
-    id SERIAL PRIMARY KEY,
-    quantity integer,
-    order_id bigint REFERENCES orders(id), 
-    product_id bigint REFERENCES products(id)
+    o_p_id SERIAL PRIMARY KEY,
+    p_quantity integer,
+    o_id bigint REFERENCES orders(o_id), 
+    p_id bigint REFERENCES products(p_id)
     );

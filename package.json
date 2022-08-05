@@ -10,9 +10,11 @@
     "prettier": "prettier --config .prettierrc \"src/**/*.ts\" --write",
     "lint": "eslint . --ext .ts",
     "migrate": "db-migrate --env test up && db-migrate up",
+    "migratereset": "db-migrate --env test reset && db-migrate reset",
     "jasmine": "jasmine",
-    "test": "ENV=test db-migrate --env test up && jasmine && db-migrate db:drop test",
-    "test1": "db-migrate reset && db-migrate up && jasmine"
+    "test": "set ENV=test && db-migrate reset && db-migrate up && jasmine",
+    "test1": "db-migrate reset && db-migrate up && jasmine",
+    "test2": "set ENV=test && db-migrate --env test reset && db-migrate --env test up && jasmine && db-migrate --env test reset"
   },
   "author": "Udacity",
   "license": "ISC",
