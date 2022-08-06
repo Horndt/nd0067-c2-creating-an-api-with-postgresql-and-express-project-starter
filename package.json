@@ -10,8 +10,7 @@
     "migrate": "db-migrate --env test up && db-migrate up",
     "migratereset": "db-migrate --env test reset &&db-migrate --env dev reset && db-migrate reset",
     "jasmine": "jasmine",
-    "test": "set ENV=test && db-migrate --env test reset && db-migrate --env test up && jasmine && db-migrate --env test reset",
-    "test_dev": "set ENV=dev && db-migrate --env dev reset && db-migrate --env dev up && jasmine && db-migrate --env dev reset"
+    "test": "set ENV=test && db-migrate --env test reset && db-migrate --env test up && jasmine && db-migrate --env test reset"
   },
   "author": "Udacity",
   "license": "ISC",
