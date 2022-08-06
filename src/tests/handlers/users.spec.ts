@@ -9,40 +9,38 @@ const user = [
     last_name: "Big",
     user_password: "Paulspassword",
   },
-  {
-    user_name: "Boss",
-    first_name: "Hassan",
-    last_name: "Ali",
-    user_password: "boss_password",
-  },
 ];
 
-describe("user Test Endpoints", () => {
-  let token: string;
+describe("Test Endpoints from Users", () => {
+  let verifytoken: string;
 
-  it("api create should open with status 200", async () => {
+  it("api create open with status 200", async () => {
     const response = await request.post("/users/create").send(user[0]);
     expect(response.status).toBe(200);
-    token = response.body;
+    verifytoken = response.body;
   });
 
-  it("api signIn should open with status 200", async () => {
+  it("api signIn open with status 200", async () => {
     const response = await request
       .post("/users/signIn")
       .send(user[0])
       .set("Approved", "json");
-    token = "Crypt " + response.body;
+    verifytoken = "Crypt " + response.body;
     expect(response.status).toBe(200);
   });
 
-  it("api index should open with status 200", async () => {
-    const response = await request.get("/users").set("Authorization", token);
+  it("api index open with status 200", async () => {
+    const response = await request
+      .get("/users")
+      .set("Authorization", verifytoken);
     expect(response.status).toBe(200);
   });
 
-  it("api index should open with status 401 for invalid token", async () => {
-    token = "Crypt " + token;
-    const response = await request.get("/users").set("Authorization", token);
+  it("api index open with status 401 for invalid token", async () => {
+    verifytoken = "Crypt " + verifytoken;
+    const response = await request
+      .get("/users")
+      .set("Authorization", verifytoken);
     expect(response.status).toBe(401);
   });
 });

@@ -9,12 +9,12 @@ const orders: Order[] = [
   },
 ];
 
-describe("Order Model", () => {
+describe("Model Order", () => {
   it("should contain show method", () => {
     expect(store.show).toBeDefined();
   });
 
-  it("show method return active orders by u_id", async () => {
+  it("return active orders by u_id", async () => {
     const result = await store.show(1);
     const order = jasmine.objectContaining(orders[0]);
     expect(result).toEqual(order);

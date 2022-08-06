@@ -8,9 +8,9 @@ const verifyAuthToken = (req: Request, res: Response, next: () => void) => {
   try {
     const authorizationHeader = req.headers.authorization;
     if (typeof authorizationHeader !== "undefined") {
-      const token = authorizationHeader.split(" ")[1];
+      const verifytoken = authorizationHeader.split(" ")[1];
       if (process.env.TOKEN_SECRET) {
-        jwt.verify(token, process.env.TOKEN_SECRET);
+        jwt.verify(verifytoken, process.env.TOKEN_SECRET);
         next();
       }
     }

@@ -1,11 +1,11 @@
 import express, { Request, Response } from "express";
+import { User, UserStore } from "../models/users";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import verifyAuthToken from "../middleware/authenticateJWT";
-import { User, UserStore } from "../models/users";
 
 dotenv.config();
-let token = " ";
+let verifytoken = " ";
 const store = new UserStore();
 const index = async (req: Request, res: Response) => {
   try {
@@ -36,10 +36,10 @@ const create = async (req: Request, res: Response) => {
       user_password: req.body.user_password,
     };
 
-    const newUser = await store.create(user);
+    const SetNewUser = await store.create(user);
     if (process.env.TOKEN_SECRET) {
-      token = jwt.sign({ user: newUser }, process.env.TOKEN_SECRET);
-      res.json(token);
+      verifytoken = jwt.sign({ user: SetNewUser }, process.env.TOKEN_SECRET);
+      res.json(verifytoken);
     }
   } catch (err) {
     res.status(400);
@@ -58,8 +58,8 @@ const signIn = async (req: Request, res: Response) => {
     const usr = await store.authenticate(user.user_name, user.user_password);
     if (usr) {
       if (process.env.TOKEN_SECRET) {
-        token = jwt.sign({ user: usr }, process.env.TOKEN_SECRET);
-        res.json(token);
+        verifytoken = jwt.sign({ user: usr }, process.env.TOKEN_SECRET);
+        res.json(verifytoken);
       }
     } else {
       res.send("Invalid attempt, either username or password ");

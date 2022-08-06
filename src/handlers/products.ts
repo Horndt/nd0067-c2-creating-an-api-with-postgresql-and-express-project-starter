@@ -1,12 +1,12 @@
 import express, { Request, Response } from "express";
-import verifyAuthToken from "../middleware/authenticateJWT";
 import { Product, ProductStore } from "../models/products";
+import verifyAuthToken from "../middleware/authenticateJWT";
 
-const store = new ProductStore();
+const Store = new ProductStore();
 
 const index = async (req: Request, res: Response) => {
   try {
-    const product: Product[] = await store.index();
+    const product: Product[] = await Store.index();
     res.json(product);
   } catch (err) {
     res.status(400);
@@ -16,7 +16,7 @@ const index = async (req: Request, res: Response) => {
 
 const show = async (req: Request, res: Response) => {
   try {
-    const product: Product = await store.show(req.body.p_id);
+    const product: Product = await Store.show(req.body.p_id);
     res.json(product);
   } catch (err) {
     res.status(400);
@@ -31,8 +31,8 @@ const create = async (req: Request, res: Response) => {
       p_price: req.body.p_price,
     };
 
-    const newProduct: Product = await store.create(product);
-    res.json(newProduct);
+    const SetNewProduct: Product = await Store.create(product);
+    res.json(SetNewProduct);
   } catch (err) {
     res.status(400);
     res.json(err);

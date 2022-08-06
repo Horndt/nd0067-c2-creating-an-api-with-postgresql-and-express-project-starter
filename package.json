@@ -1,20 +1,17 @@
 {
   "name": "storefront_backend",
   "version": "0.1.0",
-  "description": "",
+  "description": "Second Project from Udacity Full Stack JavaScript Developer",
   "main": "server.ts",
   "scripts": {
     "start": "node build/server.js",
     "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./build --onSuccess \"node ./build/server.js\"",
     "build": "npx tsc",
-    "prettier": "prettier --config .prettierrc \"src/**/*.ts\" --write",
-    "lint": "eslint . --ext .ts",
     "migrate": "db-migrate --env test up && db-migrate up",
-    "migratereset": "db-migrate --env test reset && db-migrate reset",
+    "migratereset": "db-migrate --env test reset &&db-migrate --env dev reset && db-migrate reset",
     "jasmine": "jasmine",
-    "test": "set ENV=test && db-migrate reset && db-migrate up && jasmine",
-    "test1": "db-migrate reset && db-migrate up && jasmine",
-    "test2": "set ENV=test && db-migrate --env test reset && db-migrate --env test up && jasmine && db-migrate --env test reset"
+    "test": "set ENV=test && db-migrate --env test reset && db-migrate --env test up && jasmine && db-migrate --env test reset",
+    "test_dev": "set ENV=dev && db-migrate --env dev reset && db-migrate --env dev up && jasmine && db-migrate --env dev reset"
   },
   "author": "Udacity",
   "license": "ISC",

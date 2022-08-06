@@ -3,7 +3,7 @@ import { Order, OrderStore } from "../models/orders";
 import verifyAuthToken from "../middleware/authenticateJWT";
 
 const store = new OrderStore();
-// expose current order by user
+
 const show = async (req: Request, res: Response) => {
   try {
     const order: Order = await store.show(req.body.u_id);
