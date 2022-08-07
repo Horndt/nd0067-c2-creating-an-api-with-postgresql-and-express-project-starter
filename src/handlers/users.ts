@@ -19,7 +19,7 @@ const index = async (req: Request, res: Response) => {
 
 const show = async (req: Request, res: Response) => {
   try {
-    const user: User = await store.show(req.body.user_id);
+    const user: User = await store.show(req.body.id);
     res.json(user);
   } catch (err) {
     res.status(400);

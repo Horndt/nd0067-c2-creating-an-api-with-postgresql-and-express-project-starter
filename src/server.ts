@@ -1,6 +1,6 @@
 import express, { Request, Response } from "express";
-import RoutesUsers from "./handlers/users";
 import bodyParser from "body-parser";
+import RoutesUsers from "./handlers/users";
 import RoutesProducts from "./handlers/products";
 import RoutesOrders from "./handlers/orders";
 

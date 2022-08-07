@@ -27,8 +27,8 @@ describe("Test Endpoints from Orders", () => {
 
     const conn = await Client.connect();
     const sql =
-      "INSERT INTO orders (o_id, u_id, o_status) VALUES($1, $2, $3) RETURNING *";
-    const result = await conn.query(sql, [36, newOrderUser.user_id, "active"]);
+      "INSERT INTO orders (id, u_id, o_status) VALUES($1, $2, $3) RETURNING *";
+    const result = await conn.query(sql, [36, newOrderUser.id, "active"]);
     const order = result.rows[0];
     conn.release();
     return order;
