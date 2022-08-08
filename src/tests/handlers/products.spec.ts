@@ -1,56 +1,110 @@
-import app from "../../server";
+import Client from "../../database";
 import supertest from "supertest";
-import dotenv from "dotenv";
-import { User, UserStore } from "../../models/users";
-import { Product } from "../../models/products";
-import jwt from "jsonwebtoken";
+import app from "../../server";
 
-dotenv.config();
+const deleteUsers = `DELETE FROM users;
+ALTER SEQUENCE users_id_seq RESTART WITH 1;
+UPDATE users SET id = DEFAULT`;
+const deleteProducts = `DELETE FROM products;
+ALTER SEQUENCE products_id_seq RESTART WITH 1;
+UPDATE products SET id = DEFAULT`;
 
 const request = supertest(app);
-const store = new UserStore();
+let user;
+let token: string;
 
-const products: Product[] = [
-  { p_name: "short", p_price: 15 },
-  { p_name: "shirt", p_price: 19 },
-  { p_name: "jeans", p_price: 59 },
-];
-
-let verifytoken = " ";
-describe("Test Endpoints from Products", () => {
+describe("Test /products/ ", () => {
   beforeAll(async () => {
-    const productUser: User = {
-      user_name: "PBIG",
+    user = {
       first_name: "Paul",
       last_name: "Big",
       user_password: "Paulspassword",
     };
+    token = await (await request.post("/users").send(user)).body.token;
+  });
 
-    const newProductUser = await store.create(productUser);
-    if (process.env.TOKEN_SECRET) {
-      verifytoken = jwt.sign(
-        { user: newProductUser },
-        process.env.TOKEN_SECRET
-      );
+  afterEach(async () => {
+    try {
+      const conn = await Client.connect();
+      await conn.query(deleteProducts);
+      conn.release();
+    } catch (error) {
+      throw new Error(`cant delete afterEach test: ${error}`);
+    }
+  });
+  afterAll(async () => {
+    try {
+      const conn = await Client.connect();
+      await conn.query(deleteUsers);
+      await conn.query(deleteProducts);
+
+      conn.release();
+    } catch (error) {
+      throw new Error(`cant delete afterEach test: ${error}`);
     }
   });
 
-  it("api create open with status 200", async () => {
-    verifytoken = "Crypt " + verifytoken;
-    const response = await request
-      .post("/products/create")
-      .send(products[0])
-      .set("Authorization", verifytoken);
-    expect(response.status).toBe(200);
+  describe("Test GET /products/", () => {
+    it("Should get all products", async () => {
+      await request
+        .post("/products")
+        .send({
+          p_name: "shirt",
+          p_price: 15,
+        })
+        .set("Authorization", "Crypt " + token);
+
+      const response = await request.get("/products/");
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual([
+        {
+          id: 1,
+          p_name: "shirt",
+          p_price: 15,
+        },
+      ]);
+    });
   });
 
-  it("api index open with status 200", async () => {
-    const response = await request.get("/products");
-    expect(response.status).toBe(200);
+  describe("Test GET /products/:id", () => {
+    it("Should get product with a specific id", async () => {
+      await request
+        .post("/products")
+        .send({
+          p_name: "shirt",
+          p_price: 15,
+        })
+        .set("Authorization", "Crypt " + token);
+
+      const product_id = 1;
+      const response = await request.get(`/products/${product_id}`);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual({
+        id: 1,
+        p_name: "shirt",
+        p_price: 15,
+      });
+    });
   });
 
-  it("api show open with status 200", async () => {
-    const response = await request.get("/products/false");
-    expect(response.status).toBe(200);
+  describe("Test POST /products/", () => {
+    it("Should create product with authenticateJWT", async () => {
+      const response = await request
+        .post("/products")
+        .send({
+          p_name: "shirt",
+          p_price: 15,
+        })
+        .set("Authorization", "Crypt " + token);
+
+      expect(response.statusCode).toBe(200);
+      expect(response.body).toEqual({
+        id: 1,
+        p_name: "shirt",
+        p_price: 15,
+      });
+    });
   });
 });

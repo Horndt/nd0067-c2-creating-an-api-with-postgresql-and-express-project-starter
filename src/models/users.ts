@@ -1,91 +1,92 @@
-import bcrypt from "bcrypt";
 import Client from "../database";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
 
-const saltRounds = process.env.SALT_ROUNDS;
+dotenv.config();
+
 export type User = {
   id?: number;
-  user_name: string;
   first_name: string;
   last_name: string;
   user_password: string;
 };
 
+const Crypt = process.env.BCRYBT_PASSWORD as string;
+const saltRounds = process.env.SALT_ROUNDS as string;
+
 export class UserStore {
+  destroy(id: any) {
+    throw new Error("Method not implemented.");
+  }
+  delete(id: any) {
+    throw new Error("Method not implemented.");
+  }
   async index(): Promise<User[]> {
     try {
       const conn = await Client.connect();
       const sql = "SELECT * FROM users";
       const result = await conn.query(sql);
       conn.release();
-      return result.rows;
-    } catch (err) {
-      throw new Error(`cant get users. Error: ${err}`);
+      return result.rows as User[];
+    } catch (error) {
+      throw new Error(`Cant get users: ${error}`);
     }
   }
 
   async show(id: number): Promise<User> {
     try {
-      const sql = "SELECT * FROM users WHERE id=($1)";
-
       const conn = await Client.connect();
+      const sql = "SELECT * FROM users WHERE id=($1)";
       const result = await conn.query(sql, [id]);
+
       conn.release();
-      return result.rows[0];
-    } catch (err) {
-      throw new Error(`cant get user ${id}. Error: ${err}`);
+      return result.rows[0] as User;
+    } catch (error) {
+      throw new Error(`Cant get user: ${error}`);
     }
   }
 
-  async create(usr: User): Promise<User> {
+  async create(user: User): Promise<User> {
     try {
-      if (saltRounds) {
-        const hash = bcrypt.hashSync(
-          usr.user_password + process.env.BCRYPT_PASSWORD,
-          parseInt(saltRounds)
-        );
+      const conn = await Client.connect();
+      const sql =
+        "INSERT INTO users (first_name, last_name, user_password) VALUES($1, $2, $3) RETURNING *";
+      const hash = bcrypt.hashSync(
+        user.user_password + Crypt,
+        parseInt(saltRounds)
+      );
 
-        const conn = await Client.connect();
-        const sql =
-          "INSERT INTO users (user_name, first_name, last_name, user_password) VALUES ($1, $2, $3, $4) RETURNING *";
-        const result = await conn.query(sql, [
-          usr.user_name,
-          usr.first_name,
-          usr.last_name,
-          hash,
-        ]);
-        const user = result.rows[0];
-        conn.release();
-        return user;
-      } else {
-        throw new Error("env.SALT_ROUNDS cant found");
-      }
+      const result = await conn.query(sql, [
+        user.first_name,
+        user.last_name,
+        hash,
+      ]);
+      const newUser = result.rows[0] as User;
+
+      conn.release();
+      return newUser;
     } catch (err) {
-      throw new Error(`cant add user (${usr.user_name}): ${err}`);
+      throw new Error(
+        `Cant create user (${(user.first_name, user.last_name)}): ${err}`
+      );
     }
   }
+
   async authenticate(
-    user_name: string,
+    first_name: string,
     user_password: string
   ): Promise<User | null> {
     const conn = await Client.connect();
-    const sql = "SELECT user_password FROM users WHERE user_name=($1)";
-    const result = await conn.query(sql, [user_name]);
-    if (result.rows.length) {
-      const user = result.rows[0];
-      if (
-        bcrypt.compareSync(
-          user_password + process.env.BCRYPT_PASSWORD,
-          user.user_password
-        )
-      ) {
-        return user;
-      } else {
-        throw new Error(
-          "Invalid login attempt, Try it again, Capslock aktive?."
-        );
+    const passwordSql = "SELECT password FROM users WHERE first_name=($1)";
+    const result = await conn.query(passwordSql, [first_name]);
+    if (result.rows.length > 0) {
+      const userSql = "SELECT * FROM users WHERE first_name=($1)";
+      const passowrd = result.rows[0];
+      if (bcrypt.compareSync(user_password + Crypt, passowrd)) {
+        const user = await conn.query(userSql, [first_name]);
+        return user.rows[0];
       }
     }
-    conn.release();
     return null;
   }
 }

@@ -1,31 +1,31 @@
 import express, { Request, Response } from "express";
-import { Order, OrderStore } from "../models/orders";
+import { OrderStore } from "../models/orders";
 import verifyAuthToken from "../middleware/authenticateJWT";
 
-const Store = new OrderStore();
+const store = new OrderStore();
 
 const show = async (req: Request, res: Response) => {
   try {
-    const order: Order = await Store.show(req.body.id);
-    res.json(order);
-  } catch (err) {
-    res.status(401);
-    res.json(err);
+    const orders = await store.show(parseInt(req.params.id));
+    if (!orders) {
+      return res.status(400).json({ error: "orders doesnt exist" });
+    }
+    return res.status(200).json(orders);
+  } catch (error) {
+    return res.status(400).json(error);
   }
 };
 
 const create = async (req: Request, res: Response) => {
   try {
-    const order: Order = {
-      u_id: req.body.u_id,
+    const orders = await store.create({
+      user_id: parseInt(req.body.user_id),
       o_status: req.body.o_status,
-    };
-
-    const SetNewOrder: Order = await Store.create(order);
-    res.json(SetNewOrder);
-  } catch (err) {
-    res.status(400);
-    res.json(err);
+    });
+    return res.status(200).json(orders);
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json(error);
   }
 };
 
@@ -35,8 +35,8 @@ const addProduct = async (req: Request, res: Response) => {
   const quantity: number = parseInt(req.body.quantity);
 
   try {
-    const addedProduct = await Store.addProduct(o_id, p_id, quantity);
-    res.status(201).json(addedProduct);
+    const AddNewProduct = await store.addProduct(o_id, p_id, quantity);
+    res.status(201).json(AddNewProduct);
   } catch (err) {
     res.status(400).json(err);
   }

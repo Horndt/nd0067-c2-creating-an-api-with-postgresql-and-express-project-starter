@@ -1,57 +1,87 @@
-import { User, UserStore } from "../../models/users";
+import Client from "../../database";
+import { UserStore } from "../../models/users";
 
-const store = new UserStore();
-const users = [
-  {
-    user_name: "PBIG",
-    first_name: "Paul",
-    last_name: "Big",
-  },
-];
+const userStore = new UserStore();
 
-describe("Model User", () => {
-  const user: User = {
-    user_name: users[0].user_name,
-    first_name: users[0].first_name,
-    last_name: users[0].last_name,
-    user_password: "Paulspassword",
-  };
+const deleteUsers = `DELETE FROM users;
+ALTER SEQUENCE users_id_seq RESTART WITH 1;
+UPDATE users SET id = DEFAULT`;
+const deleteProducts = `DELETE FROM products;
+ALTER SEQUENCE products_id_seq RESTART WITH 1;
+UPDATE products SET id = DEFAULT`;
+const deleteOrders = `DELETE FROM orders;
+ALTER SEQUENCE orders_id_seq RESTART WITH 1;
+UPDATE orders SET id = DEFAULT`;
 
-  it("should contain create method", () => {
-    expect(store.create).toBeDefined();
+describe("model users", () => {
+  beforeEach(async () => {
+    try {
+      const conn = await Client.connect();
+      await conn.query(deleteUsers);
+      await conn.query(deleteProducts);
+      await conn.query(deleteOrders);
+
+      conn.release();
+    } catch (error) {
+      throw new Error(`cant delete beforeEach test: ${error}`);
+    }
   });
 
-  it("should contain index method", () => {
-    expect(store.index).toBeDefined();
+  afterEach(async () => {
+    try {
+      const conn = await Client.connect();
+      await conn.query(deleteUsers);
+      await conn.query(deleteProducts);
+      await conn.query(deleteOrders);
+
+      conn.release();
+    } catch (error) {
+      throw new Error(`cant delete afterEach test: ${error}`);
+    }
   });
 
-  it("should contain show method", () => {
-    expect(store.show).toBeDefined();
+  it("should have create method", () => {
+    expect(userStore.create).toBeDefined();
+  });
+  it("Should create user", async () => {
+    const newUser = await userStore.create({
+      first_name: "Max",
+      last_name: "Mustermann",
+      user_password: "Maxspassword",
+    });
+    expect(newUser).toEqual({
+      id: 1,
+      first_name: "Max",
+      last_name: "Mustermann",
+      user_password: newUser.user_password,
+    });
   });
 
-  it("should contain authenticate method", () => {
-    expect(store.authenticate).toBeDefined();
+  it("should have index method", () => {
+    expect(userStore.index).toBeDefined();
+  });
+  it("index method should return list of users", async () => {
+    const result = await userStore.index();
+    expect(result).toEqual([]);
   });
 
-  it("add user", async () => {
-    const result = await store.create(user);
-    expect(result).toBeTruthy;
+  it("should have show method", () => {
+    expect(userStore.show).toBeDefined();
   });
+  it("Should get user with specific id", async () => {
+    const newUser = await userStore.create({
+      first_name: "Paul",
+      last_name: "Small",
+      user_password: "Smallspassword",
+    });
 
-  it("return the entire list of users", async () => {
-    const result = await store.index();
-    const usr = jasmine.objectContaining(users[0]);
-    expect(result).toContain(usr);
-  });
+    const result = await userStore.show(1);
 
-  it("return the selected user", async () => {
-    const result = await store.show(3);
-    const usr = jasmine.objectContaining(users[0]);
-    expect(result).toEqual(usr);
-  });
-
-  it("confirm the user existence", async () => {
-    const result = await store.authenticate(user.user_name, user.user_password);
-    expect(result).not.toBeNull;
+    expect(result).toEqual({
+      id: 1,
+      first_name: "Paul",
+      last_name: "Small",
+      user_password: result.user_password,
+    });
   });
 });

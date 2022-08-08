@@ -11,12 +11,11 @@ const {
   ENV,
 } = process.env;
 
-// recruite the method pool as the actual connection to the database
-const client = new Pool({
+const Client = new Pool({
   host: POSTGRES_HOST,
   database: ENV === "dev" ? POSTGRES_DB : POSTGRES_TEST_DB,
   user: POSTGRES_USER,
   password: `${POSTGRES_PASSWORD}`,
 });
 
-export default client;
+export default Client;
